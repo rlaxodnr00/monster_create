@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: e0d717c6b44b6294c85f729b5054e1de
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 211829
+  packageName: AI Sound Detection
+  packageVersion: 18.4
+  assetPath: Assets/AISoundDetection/Scripts/ExtraScripts/NotesAndInfo.cs
+  uploadId: 650967

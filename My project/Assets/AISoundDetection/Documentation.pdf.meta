@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ee21456d90e6f8440a132b8ef55fb8c2
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 211829
+  packageName: AI Sound Detection
+  packageVersion: 18.4
+  assetPath: Assets/AISoundDetection/Documentation.pdf
+  uploadId: 650967

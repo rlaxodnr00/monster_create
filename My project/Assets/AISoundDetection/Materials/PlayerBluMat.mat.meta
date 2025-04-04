@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f2a34ed46295b1142939dd6a737aa576
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 211829
+  packageName: AI Sound Detection
+  packageVersion: 18.4
+  assetPath: Assets/AISoundDetection/Materials/PlayerBluMat.mat
+  uploadId: 650967

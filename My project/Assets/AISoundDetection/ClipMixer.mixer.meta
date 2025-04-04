@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0e556cff3f7ed184c9befe17de890246
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 211829
+  packageName: AI Sound Detection
+  packageVersion: 18.4
+  assetPath: Assets/AISoundDetection/ClipMixer.mixer
+  uploadId: 650967

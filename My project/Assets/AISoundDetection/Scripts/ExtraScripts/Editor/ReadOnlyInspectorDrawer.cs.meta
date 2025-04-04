@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 853f3d6da979ab24da455b0439e3f6f9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 211829
+  packageName: AI Sound Detection
+  packageVersion: 18.4
+  assetPath: Assets/AISoundDetection/Scripts/ExtraScripts/Editor/ReadOnlyInspectorDrawer.cs
+  uploadId: 650967

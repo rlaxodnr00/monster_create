@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: a5c527f21e1685f4bb3dc29765fc62a7
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 211829
+  packageName: AI Sound Detection
+  packageVersion: 18.4
+  assetPath: Assets/AISoundDetection/Scripts/ExtraScripts/SO_SoundManagerContainer.cs
+  uploadId: 650967

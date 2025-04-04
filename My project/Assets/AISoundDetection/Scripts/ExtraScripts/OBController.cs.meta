@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2fdebc3201e218e4e965a5cdf6d79946
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 211829
+  packageName: AI Sound Detection
+  packageVersion: 18.4
+  assetPath: Assets/AISoundDetection/Scripts/ExtraScripts/OBController.cs
+  uploadId: 650967

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0726b766099256048bb803132976f4ee
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 211829
+  packageName: AI Sound Detection
+  packageVersion: 18.4
+  assetPath: Assets/AISoundDetection/TestScene14.unity
+  uploadId: 650967

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 5de2674334e7a5e44bf6506ebb31f4f1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 211829
+  packageName: AI Sound Detection
+  packageVersion: 18.4
+  assetPath: Assets/AISoundDetection/Scripts/ExtraScripts/Editor/TagSelectorPropertyDrawer.cs
+  uploadId: 650967

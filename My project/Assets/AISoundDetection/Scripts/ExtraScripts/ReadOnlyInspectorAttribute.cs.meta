@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 5a94e01ae0a74a74ca4a1bf9f595bf9d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 211829
+  packageName: AI Sound Detection
+  packageVersion: 18.4
+  assetPath: Assets/AISoundDetection/Scripts/ExtraScripts/ReadOnlyInspectorAttribute.cs
+  uploadId: 650967
