@@ -23,10 +23,10 @@ namespace AiSoundDetect
 		[HideInInspector]public  AudioSource waveEmitter;
 		private AudioMixerGroup mixerEmitter;
 		[Tooltip("Set the Distance the wave will travel")]
-		[SerializeField][Range(0.0f,10.0f)] private float WaveDistance = 3f; 
+		[SerializeField][Range(0.0f,30.0f)] private float WaveDistance = 3f; 
 		[SerializeField][ReadOnlyInspector]public float soundLevel ;
 		[SerializeField][ReadOnlyInspector]public float maxSoundLevelReach;
-		[SerializeField][Range(0.0f,1000.0f)]private float soundDensity = 300.0f;
+		[SerializeField][Range(0.0f,5000.0f)]private float soundDensity = 300.0f;
 		private float soundLevelScale = 10f;
 	 const int QSAMPLES = 128;
 	 const float REFVAL = 0.1f;  // RMS for 0 dB

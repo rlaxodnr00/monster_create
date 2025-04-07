@@ -269,7 +269,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c67450d323e3654f91f83a6086b2700, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mouseSensitivity: 100
+  mouseSensitivity: 50
   playerBody: {fileID: 573808247}
 --- !u!1 &410087039
 GameObject:
@@ -882,14 +882,14 @@ MonoBehaviour:
   objectEmitterSource: {fileID: 1705883341}
   m_AudioClip: {fileID: 0}
   waveEmitter: {fileID: 0}
-  WaveDistance: 10
+  WaveDistance: 30
   soundLevel: 0
   maxSoundLevelReach: 0
-  soundDensity: 945
+  soundDensity: 5000
   layerToCollideWith:
     serializedVersion: 2
     m_Bits: 64
-  enableSoundVisualization: 1
+  enableSoundVisualization: 0
   m_particleSystem: {fileID: 0}
   m_iAudioClip: {fileID: 8300000, guid: 153d99f2c0c6e9244a81ba3eb4d637c4, type: 3}
   m_ClipLenght: 3.19
@@ -1581,6 +1581,7 @@ MonoBehaviour:
   targetDetected: 0
   ObjectFiltered: []
   ObjectsCloseAroundCorner: []
+  forceDetectDistance: 10
 --- !u!54 &1331126793
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1672,7 +1673,6 @@ MonoBehaviour:
   chaseTarget: 1
   AiVoice: {fileID: 1259971397}
   patrolRadius: 10
-  patrolWaitTime: 3
 --- !u!95 &1331126799
 Animator:
   serializedVersion: 7

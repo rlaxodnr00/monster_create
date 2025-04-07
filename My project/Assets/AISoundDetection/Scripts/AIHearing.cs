@@ -18,7 +18,8 @@ public class AIHearing : MonoBehaviour
 	[Tooltip("How loud to be the sound for to be detected")] 
 	                          [SerializeField] private float soundDetectAroundCorner = 1.0f;
 	[Tooltip("Set how far to hear around the corner")]
-	                          [SerializeField] private float distanceHearingAroundCorner = 3.0f;
+
+        [SerializeField] private float distanceHearingAroundCorner = 3.0f;
            [ReadOnlyInspector][SerializeField]private float distanceToObj = 0.0f;
 	                          [SerializeField] private float highSoundLevel =30f;
 	                          [SerializeField] private float timeAlert = 5.0f;
@@ -33,12 +34,14 @@ public class AIHearing : MonoBehaviour
                                        private NavMeshAgent NavAgent;
   [HideInInspector][SerializeField]private List<GameObject> ObjectFiltered;
 	[HideInInspector][SerializeField]private List<GameObject> ObjectsCloseAroundCorner;
-	 //public float rms;
-	//public float dbv;
-	//float preAlertTime =4f;
-	//bool soundObstructed;
-	 #region Start
-    void Start()
+        [Tooltip("무조건 감지 범위")]
+        [SerializeField] public float forceDetectDistance = 5.0f;
+        //public float rms;
+        //public float dbv;
+        //float preAlertTime =4f;
+        //bool soundObstructed;
+        #region Start
+        void Start()
     {
 	    alertTime =timeAlert;
 	    NavAgent = gameObject.GetComponent<NavMeshAgent>();
@@ -62,42 +65,90 @@ public class AIHearing : MonoBehaviour
 	    }
 	   
 	}
-	  #endregion
-	
-	#region PerimeterScan
- public void PerimeterScan()  // this will check for objects how far can be listen and around corners
-    {
-       soundTargetObj = Physics.OverlapSphere(transform.position, perimeterAlert); 
+        #endregion
 
-	    if(distanceToObj > distanceHearingAroundCorner) {ObjectFiltered.Clear();ObjectsCloseAroundCorner.Clear();}
-      foreach(var hit in soundTargetObj)
+        #region PerimeterScan
+        /*
+         * public void PerimeterScan()  // this will check for objects how far can be listen and around corners
+           {
+              soundTargetObj = Physics.OverlapSphere(transform.position, perimeterAlert); 
+
+               if(distanceToObj > distanceHearingAroundCorner) {ObjectFiltered.Clear();ObjectsCloseAroundCorner.Clear();}
+             foreach(var hit in soundTargetObj)
+               {
+                 if(hit.CompareTag(TagFilter.ToString()))
+                   {
+                     if(!ObjectFiltered.Contains(hit.gameObject))
+                     {ObjectFiltered.Add(hit.gameObject);}
+
+                     targetDetected = true;
+                     //////Here we check if the sound is not to high and in that case the AI will notice indiferent of distance around the corner
+
+                     if(hit.gameObject.TryGetComponent <Sound_Emitter>(out Sound_Emitter componentSE) && componentSE.soundLevel >highSoundLevel  && !directSoundHit)// &&!soundObstructed)
+                     {
+
+                        soundDetected = true;
+                         targetObj = hit.transform.position;
+                     }
+                   else if(hit.gameObject.TryGetComponent <Mic_Emitter>(out Mic_Emitter componentMic)&& componentMic.micSoundLevel>highSoundLevel && !directSoundHit)//&&!soundObstructed)
+                     { 
+                       soundDetected = true;
+                         targetObj = hit.transform.position;    
+                     }
+                   }
+                 }
+           }
+        */
+        public void PerimeterScan() // 개선 버전
         {
-          if(hit.CompareTag(TagFilter.ToString()))
-	        {
-	          if(!ObjectFiltered.Contains(hit.gameObject))
-	          {ObjectFiltered.Add(hit.gameObject);}
-	         
-	          targetDetected = true;
-	          //////Here we check if the sound is not to high and in that case the AI will notice indiferent of distance around the corner
-	          
-	          if(hit.gameObject.TryGetComponent <Sound_Emitter>(out Sound_Emitter componentSE) && componentSE.soundLevel >highSoundLevel  && !directSoundHit)// &&!soundObstructed)
-	          {
-	          
-	             soundDetected = true;
-		          targetObj = hit.transform.position;
-	          }
-            else if(hit.gameObject.TryGetComponent <Mic_Emitter>(out Mic_Emitter componentMic)&& componentMic.micSoundLevel>highSoundLevel && !directSoundHit)//&&!soundObstructed)
-	          { 
-	          	soundDetected = true;
-		          targetObj = hit.transform.position;    
-	          }
+            soundTargetObj = Physics.OverlapSphere(transform.position, perimeterAlert);
+
+            if (distanceToObj > distanceHearingAroundCorner)
+            {
+                ObjectFiltered.Clear();
+                ObjectsCloseAroundCorner.Clear();
             }
-	      }
-    }
-    #endregion
-    
-	#region ActiveHearing
-	void ActiveHearing()
+
+            foreach (var hit in soundTargetObj)
+            {
+                if (hit.CompareTag(TagFilter.ToString()))
+                {
+                    float distanceToTarget = Vector3.Distance(transform.position, hit.transform.position); // 거리 계산
+
+                    if (!ObjectFiltered.Contains(hit.gameObject))
+                        ObjectFiltered.Add(hit.gameObject);
+
+                    targetDetected = true;
+
+                    // 강제 감지 거리 이내라면 무조건 감지
+                    if (distanceToTarget <= forceDetectDistance)
+                    {
+                        soundDetected = true;
+                        targetObj = hit.transform.position;
+                        Debug.Log("Force-detected sound within range");
+                        continue; // 아래 조건 무시하고 다음으로 넘어감
+                    }
+
+                    // 기존의 고음량 감지 로직
+                    if (hit.gameObject.TryGetComponent<Sound_Emitter>(out Sound_Emitter componentSE)
+                        && componentSE.soundLevel > highSoundLevel && !directSoundHit)
+                    {
+                        soundDetected = true;
+                        targetObj = hit.transform.position;
+                    }
+                    else if (hit.gameObject.TryGetComponent<Mic_Emitter>(out Mic_Emitter componentMic)
+                        && componentMic.micSoundLevel > highSoundLevel && !directSoundHit)
+                    {
+                        soundDetected = true;
+                        targetObj = hit.transform.position;
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region ActiveHearing
+        void ActiveHearing()
 	{
       foreach(GameObject obj in ObjectsCloseAroundCorner) 
 		{
