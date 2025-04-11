@@ -1159,7 +1159,7 @@ Transform:
   m_GameObject: {fileID: 862239311}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1.08}
+  m_LocalPosition: {x: 0, y: 0, z: 4.37}
   m_LocalScale: {x: 5, y: 4, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1875,11 +1875,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af132675c046d7f43b4a5a591c86d582, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hearingRadius: 30
+  soundLayer:
+    serializedVersion: 2
+    m_Bits: 0
   soundDetected: 0
-  perimeterAlert: 50
+  perimeterAlert: 100
   TagFilter: SoundEmitter
   soundDetectAroundCorner: 1
-  distanceHearingAroundCorner: 15
+  distanceHearingAroundCorner: 20
   distanceToObj: 0
   highSoundLevel: 1
   timeAlert: 2
@@ -2055,7 +2059,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -2079,7 +2083,7 @@ MonoBehaviour:
   chaseTarget: 1
   AiVoice: {fileID: 1259971397}
   patrolRadius: 10
-  patrolWaitTime: 3
+  patrolWaitTime: 1.5
 --- !u!1 &1496068482
 GameObject:
   m_ObjectHideFlags: 0

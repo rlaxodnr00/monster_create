@@ -11,7 +11,10 @@ namespace AiSoundDetect
 	[AddComponentMenu("AiSoundDetect/AIHearing")]
 public class AIHearing : MonoBehaviour
 {
-                                               public bool soundDetected  = false;  ///////this is the main Bool that should trigger any actions //////
+        public float hearingRadius = 30f; // 소리 감지 범위
+        public LayerMask soundLayer;
+        private Transform targetSound;
+        public bool soundDetected  = false;  ///////this is the main Bool that should trigger any actions //////
 	
 	                         [SerializeField] private float perimeterAlert; 
 	                            [TagSelector] public string TagFilter = "";
@@ -248,46 +251,69 @@ public class AIHearing : MonoBehaviour
           }
           
        }
-      #endregion 
-      
-      /*
-	void SoundObstruction() // work in progress - sound can be obstructed by other sounds
-	{
-		const int QSAMPLES = 128;
-		const float REFVAL = 0.1f;  // RMS for 0 dB
- 
-		float[] samples = new float[QSAMPLES];
- 
-		AudioListener.GetOutputData(samples, 0);
- 
-		float sqrSum = 0.0f;
- 
-		int i = QSAMPLES; while (i --> 0) {
- 
-			sqrSum += samples[i] * samples[i];
-		}
- 
-		rms = Mathf.Sqrt(sqrSum/QSAMPLES); // rms value 0-1
-		//dbv = 20.0f*Mathf.Log10(rms/REFVAL); // dB value
-		dbv = 20.0f*Mathf.Abs(rms/REFVAL); // dB value
-		if( dbv > 40 )
-		{
-			soundObstructed = true;
-		}
-		if(soundObstructed == true)
-		{
-			preAlertTime -= Time.deltaTime;
-			if(preAlertTime<= 0)
-			{
-				soundObstructed = false;
-				preAlertTime = 2f;
-			}
-		}
-		
-	}  */
-	
-	#region OnDrawGizmosSelected
-       void OnDrawGizmosSelected()   // visual perimeter in scene of AI 
+        #endregion
+
+        public bool HearSound(out Vector3 soundPosition)
+        {
+            Collider[] sounds = Physics.OverlapSphere(transform.position, hearingRadius, soundLayer);
+            if (sounds.Length > 0)
+            {
+                // 가장 가까운 소리를 찾음
+                float closest = float.MaxValue;
+                soundPosition = Vector3.zero;
+                foreach (Collider col in sounds)
+                {
+                    float dist = Vector3.Distance(transform.position, col.transform.position);
+                    if (dist < closest)
+                    {
+                        closest = dist;
+                        soundPosition = col.transform.position;
+                    }
+                }
+                return true;
+            }
+            soundPosition = Vector3.zero;
+            return false;
+        }
+
+        /*
+      void SoundObstruction() // work in progress - sound can be obstructed by other sounds
+      {
+          const int QSAMPLES = 128;
+          const float REFVAL = 0.1f;  // RMS for 0 dB
+
+          float[] samples = new float[QSAMPLES];
+
+          AudioListener.GetOutputData(samples, 0);
+
+          float sqrSum = 0.0f;
+
+          int i = QSAMPLES; while (i --> 0) {
+
+              sqrSum += samples[i] * samples[i];
+          }
+
+          rms = Mathf.Sqrt(sqrSum/QSAMPLES); // rms value 0-1
+          //dbv = 20.0f*Mathf.Log10(rms/REFVAL); // dB value
+          dbv = 20.0f*Mathf.Abs(rms/REFVAL); // dB value
+          if( dbv > 40 )
+          {
+              soundObstructed = true;
+          }
+          if(soundObstructed == true)
+          {
+              preAlertTime -= Time.deltaTime;
+              if(preAlertTime<= 0)
+              {
+                  soundObstructed = false;
+                  preAlertTime = 2f;
+              }
+          }
+
+      }  */
+
+        #region OnDrawGizmosSelected
+        void OnDrawGizmosSelected()   // visual perimeter in scene of AI 
       {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, perimeterAlert );
