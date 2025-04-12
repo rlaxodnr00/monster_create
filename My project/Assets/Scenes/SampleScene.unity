@@ -2082,7 +2082,7 @@ MonoBehaviour:
   AIHearing: {fileID: 1331126790}
   chaseTarget: 1
   AiVoice: {fileID: 1259971397}
-  patrolRadius: 10
+  patrolRadius: 25
   patrolWaitTime: 1.5
 --- !u!1 &1496068482
 GameObject:

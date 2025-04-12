@@ -35,9 +35,13 @@ namespace AiSoundDetect.Extra
         private float chaseTimer = 0f; // 추격 경과 시간
 
         private Coroutine patrolCoroutine = null;
+        private AIHearing hearingScript;
+        private bool isAttacking = false;
 
         void Start()
         {
+            Debug.Log("Start");
+            hearingScript = AIHearing.GetComponent<AIHearing>();
             navMeshAgent = GetComponent<NavMeshAgent>();
             animator = GetComponent<Animator>();
 
@@ -54,8 +58,8 @@ namespace AiSoundDetect.Extra
         void Update()
         {
             // AIHearing으로부터 소리 감지 여부와 목표 위치 받아오기
-            soundDetectedGo = AIHearing.GetComponent<AIHearing>().soundDetected;
-            targetGo = AIHearing.GetComponent<AIHearing>().targetObj;
+            soundDetectedGo = hearingScript.soundDetected;
+            targetGo = hearingScript.targetObj;
 
             // 소리가 감지되고 추격 가능할 경우
             if (soundDetectedGo && chaseTarget)
@@ -106,7 +110,7 @@ namespace AiSoundDetect.Extra
                 StopChasing(); // 추격 중단 처리
             }
             // 아무 상태도 아닐 경우 배회 루틴 시작
-            else if (!isPatrolling)
+            else if (!isPatrolling && patrolCoroutine == null)
             {
                 patrolCoroutine = StartCoroutine(PatrolRoutine());
                 // StartCoroutine(PatrolRoutine());
@@ -139,6 +143,7 @@ namespace AiSoundDetect.Extra
         // 추격을 종료하고 idle 상태로 전환
         private void StopChasing()
         {
+            Debug.Log("StopCHsasing");
             isChasing = false;
             isPatrolling = false;
             chaseTimer = 0f;
@@ -157,7 +162,9 @@ namespace AiSoundDetect.Extra
         // 배회 루틴 (랜덤 위치로 이동하고 잠시 대기)
         private IEnumerator PatrolRoutine()
         {
+            Debug.Log("PatrolRoutine");
             isPatrolling = true;
+            patrolCoroutine = null;
 
             while (!isChasing)
             {
@@ -171,8 +178,13 @@ namespace AiSoundDetect.Extra
                 animator.SetBool("run", false);
 
                 // 목적지 도착까지 대기
-                while (!navMeshAgent.pathPending && navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+                float timer = 0f;
+                while (!navMeshAgent.pathPending &&
+                       navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance &&
+                       navMeshAgent.pathStatus == NavMeshPathStatus.PathComplete &&
+                       timer < 5f)
                 {
+                    timer += Time.deltaTime;
                     yield return null;
                 }
 
@@ -188,16 +200,17 @@ namespace AiSoundDetect.Extra
         }
         private Vector3 GetSafeRandomPatrolPosition()
         {
+            Debug.Log("GetSafeRandomPatrolPosition");
             // 현재 위치와 너무 가까운 위치는 제외
             Vector3 randomPosition;
-            int maxAttempts = 5;
+            int maxAttempts = 10;
             int attempts = 0;
 
             do
             {
                 randomPosition = GetRandomNavMeshPosition();
                 attempts++;
-            } while (Vector3.Distance(transform.position, randomPosition) < 1.5f && attempts < maxAttempts);
+            } while (Vector3.Distance(transform.position, randomPosition) < 2f && attempts < maxAttempts);
 
             return randomPosition;
         }
@@ -205,25 +218,29 @@ namespace AiSoundDetect.Extra
         // NavMesh 상의 랜덤 위치 반환 함수
         private Vector3 GetRandomNavMeshPosition()
         {
+            Debug.Log("GetRandomNavMeshPosition");
             Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
             randomDirection += transform.position; // 현재 위치 기준 방향 설정
 
             NavMeshHit hit;
-            if (NavMesh.SamplePosition(randomDirection, out hit, patrolRadius, 1))
+            if (NavMesh.SamplePosition(randomDirection, out hit, patrolRadius, NavMesh.AllAreas))
             {
                 return hit.position; // 유효한 위치 반환
             }
+            Debug.LogWarning("유효한 NavMesh 위치를 찾지 못함. 현재 위치로 대체.");
             return transform.position; // 실패 시 현재 위치 반환
         }
 
         // 공격 함수 (애니메이션 트리거와 이동 중단 포함)
         void Attack()
         {
-            //Debug.Log(">> 공격 시작");
+            Debug.Log("Attack");
             // 이미 공격 중이면 중복 방지
-            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Attack")) return;
+            if (isAttacking) return;
 
+            isAttacking = true;
             // 현재 위치에서 멈춤
+
             navMeshAgent.SetDestination(transform.position);
             navMeshAgent.isStopped = true;
 
@@ -237,8 +254,10 @@ namespace AiSoundDetect.Extra
         // 공격 애니메이션이 끝난 후 다시 이동
         private IEnumerator ResumeAfterAttack()
         {
+            Debug.Log("ResumeAfterAttack");
             yield return new WaitForSeconds(2f); // 애니메이션 시간
 
+            isAttacking = false;
             navMeshAgent.isStopped = false;
 
             if (!isChasing)
@@ -257,18 +276,29 @@ namespace AiSoundDetect.Extra
             // 충돌 대상이 player면
             if (other.CompareTag("Player"))
             {
+                Debug.Log("collider player");
                 float distance = Vector3.Distance(transform.position, other.transform.position);
 
                 if (distance < attackRange)
                 {
+                    // 플레이어 방향을 바라보도록 회전
+                    Vector3 direction = (other.transform.position - transform.position).normalized;
+                    direction.y = 0f; // 수직 회전 제거 (회전 축 고정)
                     // 공격 가능 범위에 들어오면 공격 시도
+                    if (direction != Vector3.zero)
+                    {
+                        Quaternion lookRotation = Quaternion.LookRotation(direction);
+                        transform.rotation = lookRotation;
+                    }
                     Attack();
                     chaseTimer = 0f; // 추격 성공 → 타이머 초기화
                 }
             }
         }
+
         private IEnumerator ResumePatrolAfterDelay(float delay)
         {
+            Debug.Log("ResumePatrolAfterDelay");
             yield return new WaitForSeconds(delay);
 
             // 기존 루틴 중복 방지
