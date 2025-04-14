@@ -24,6 +24,17 @@ namespace AiSoundDetect.Extra
         private NavMeshAgent navMeshAgent; // 네비게이션 이동 처리용
         private Animator animator; // 애니메이션 제어용
 
+
+        // --------------------[발소리] -----------------
+
+        [Tooltip("zombie foot step")]
+        [SerializeField] private AudioClip[] walkSounds; // 걷기 사운드 5개
+        [SerializeField] private AudioClip[] runSounds;  // 달리기 사운드 5개
+        [SerializeField] private AudioSource movementAudioSource; // 사운드를 재생할 AudioSource
+        
+        private float footstepDelay = 0.6f;                 // 발소리 간 간격
+        private float lastFootstepTime = 0f;
+
         // --------------------[상태 변수]--------------------
 
         private bool soundDetectedGo; // 소리 감지 여부
@@ -141,6 +152,7 @@ namespace AiSoundDetect.Extra
                         patrolCoroutine = StartCoroutine(PatrolRoutine());
                 }
             }
+            TryPlayFootstep(); // 발소리
         }
 
         // --------------------[추격 종료 처리]--------------------
@@ -210,7 +222,7 @@ namespace AiSoundDetect.Extra
             Debug.Log("GetSafeRandomPatrolPosition");
 
             Vector3 randomPosition;
-            int maxAttempts = 10;
+            int maxAttempts = 30;
             int attempts = 0;
 
             do
@@ -320,5 +332,40 @@ namespace AiSoundDetect.Extra
             navMeshAgent.isStopped = false;
             patrolCoroutine = StartCoroutine(PatrolRoutine());
         }
+        
+        // 걷는 소리
+        private void PlayWalkSound()
+        {
+            if (walkSounds.Length == 0 || movementAudioSource.isPlaying) return;
+
+            int index = Random.Range(0, walkSounds.Length);
+            movementAudioSource.clip = walkSounds[index];
+            movementAudioSource.Play();
+        }
+
+        // 뛰는 소리
+        private void PlayRunSound()
+        {
+            if (runSounds.Length == 0 || movementAudioSource.isPlaying) return;
+
+            int index = Random.Range(0, runSounds.Length);
+            movementAudioSource.clip = runSounds[index];
+            movementAudioSource.Play();
+        }
+
+        // 발소리 간격 조정
+        private void TryPlayFootstep()
+        {
+            if (Time.time - lastFootstepTime < footstepDelay) return;
+
+            if (animator.GetBool("walk") && !isChasing)
+                PlayWalkSound();
+            else if (animator.GetBool("run") && isChasing)
+                PlayRunSound();
+
+            lastFootstepTime = Time.time;
+        }
+
+
     }
 }
