@@ -35,6 +35,12 @@ namespace AiSoundDetect.Extra
         private float footstepDelay = 0.6f;                 // 발소리 간 간격
         private float lastFootstepTime = 0f;
 
+        // --------------------[몬스터 속도]------------------
+
+        [Header("AI Movement Speeds")]
+        [SerializeField] private float walkSpeed = 2f; // 걷는 속도
+        [SerializeField] private float runSpeed = 4f;  // 뛰는 속도
+
         // --------------------[상태 변수]--------------------
 
         private bool soundDetectedGo; // 소리 감지 여부
@@ -46,7 +52,7 @@ namespace AiSoundDetect.Extra
         private Vector3 patrolTarget; // 배회 목표 위치
         private Coroutine patrolCoroutine = null; // 배회 루틴 저장용
 
-        private float attackRange = 3.5f; // 공격 가능 거리
+        private float attackRange = 3.3f; // 공격 가능 거리
 
         // --------------------[추격 사운드 쿨타임]--------------------
 
@@ -57,7 +63,7 @@ namespace AiSoundDetect.Extra
 
         private float chaseTimeout = 10f; // 추격 지속 시간 제한
         private float chaseTimer = 0f; // 현재 추격 경과 시간
-
+        
         // --------------------[초기화]--------------------
 
         void Start()
@@ -68,6 +74,10 @@ namespace AiSoundDetect.Extra
             hearingScript = AIHearing.GetComponent<AIHearing>();
             navMeshAgent = GetComponent<NavMeshAgent>();
             animator = GetComponent<Animator>();
+
+            // 회전 설정
+            navMeshAgent.updateRotation = true; // 자동 회전 활성화
+            navMeshAgent.angularSpeed = 180f;   // 회전 속도 (기본값은 120, 너무 낮으면 느리게 회전함)
 
             // 배회 루틴 시작
             patrolCoroutine = StartCoroutine(PatrolRoutine());
@@ -111,6 +121,7 @@ namespace AiSoundDetect.Extra
                         animator.SetBool("run", true);
                         animator.SetBool("idle", false);
 
+                        navMeshAgent.speed = runSpeed;
                         navMeshAgent.SetDestination(targetGo);
                         chaseTimer += Time.deltaTime;
 
@@ -159,9 +170,9 @@ namespace AiSoundDetect.Extra
 
         private void StopChasing()
         {
-            Debug.Log("StopCHsasing");
+            Debug.Log("StopChasing");
+
             isChasing = false;
-            isPatrolling = false;
             chaseTimer = 0f;
             lastVoiceTime = -Mathf.Infinity;
 
@@ -171,23 +182,23 @@ namespace AiSoundDetect.Extra
             animator.SetBool("walk", false);
             animator.SetBool("idle", true);
 
-            // 잠깐 대기 후 배회 재개
+            // 1초 후 배회 루틴 실행
             StartCoroutine(ResumePatrolAfterDelay(1f));
         }
+
 
         // --------------------[배회 루틴]--------------------
 
         private IEnumerator PatrolRoutine()
         {
-            Debug.Log("PatrolRoutine");
-
+            navMeshAgent.speed = walkSpeed;
             isPatrolling = true;
-            patrolCoroutine = null;
 
             while (!isChasing)
             {
-                // 랜덤 배회 위치 설정
-                patrolTarget = GetRandomNavMeshPosition();
+                Debug.Log("PatrolRoutine 실행 중");
+
+                patrolTarget = GetSafeRandomPatrolPosition();
                 navMeshAgent.isStopped = false;
                 navMeshAgent.SetDestination(patrolTarget);
 
@@ -195,26 +206,31 @@ namespace AiSoundDetect.Extra
                 animator.SetBool("idle", false);
                 animator.SetBool("run", false);
 
-                float timer = 0f;
+                float waitTimer = 0f;
+                bool reached = false;
 
-                // 목표 도달까지 대기
-                while (!navMeshAgent.pathPending &&
-                       navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance &&
-                       navMeshAgent.pathStatus == NavMeshPathStatus.PathComplete &&
-                       timer < 5f)
+                while (!reached && waitTimer < 10f)
                 {
-                    timer += Time.deltaTime;
+                    if (!navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+                    {
+                        reached = true;
+                    }
+
+                    waitTimer += Time.deltaTime;
                     yield return null;
                 }
 
                 navMeshAgent.ResetPath();
                 animator.SetBool("walk", false);
+                animator.SetBool("idle", true);
 
                 yield return new WaitForSeconds(patrolWaitTime);
             }
 
             isPatrolling = false;
+            patrolCoroutine = null;
         }
+
 
         // 너무 가까운 위치는 피해서 랜덤 위치 설정
         private Vector3 GetSafeRandomPatrolPosition()
@@ -231,6 +247,8 @@ namespace AiSoundDetect.Extra
                 attempts++;
             } while (Vector3.Distance(transform.position, randomPosition) < 2f && attempts < maxAttempts);
 
+            Debug.Log($"선택된 배회 위치: {randomPosition} (시도 횟수: {attempts})");
+
             return randomPosition;
         }
 
@@ -239,14 +257,20 @@ namespace AiSoundDetect.Extra
         {
             Debug.Log("GetRandomNavMeshPosition");
 
-            Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
-            randomDirection += transform.position;
+            for (int i = 0; i < 30; i++)
+            {
+                Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
+                randomDirection += transform.position;
 
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(randomDirection, out hit, patrolRadius, NavMesh.AllAreas))
-                return hit.position;
+                NavMeshHit hit;
+                if (NavMesh.SamplePosition(randomDirection, out hit, patrolRadius * 2f, NavMesh.AllAreas))
+                {
+                    Debug.DrawRay(hit.position, Vector3.up * 2, Color.green, 1.0f); // 성공 위치 시각화
+                    return hit.position;
+                }
+            }
 
-            Debug.LogWarning("유효한 NavMesh 위치를 찾지 못함. 현재 위치로 대체.");
+            Debug.LogWarning("유효한 NavMesh 위치를 30회 시도했지만 찾지 못했습니다. 현재 위치 반환.");
             return transform.position;
         }
 
@@ -274,6 +298,7 @@ namespace AiSoundDetect.Extra
         {
             Debug.Log("ResumeAfterAttack");
 
+            navMeshAgent.speed = walkSpeed;
             yield return new WaitForSeconds(2f);
 
             isAttacking = false;
@@ -323,16 +348,13 @@ namespace AiSoundDetect.Extra
 
             yield return new WaitForSeconds(delay);
 
-            if (patrolCoroutine != null)
+            if (!isChasing && patrolCoroutine == null)
             {
-                StopCoroutine(patrolCoroutine);
-                patrolCoroutine = null;
+                patrolCoroutine = StartCoroutine(PatrolRoutine());
             }
-
-            navMeshAgent.isStopped = false;
-            patrolCoroutine = StartCoroutine(PatrolRoutine());
         }
-        
+
+
         // 걷는 소리
         private void PlayWalkSound()
         {

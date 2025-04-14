@@ -1330,7 +1330,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1894,7 +1894,7 @@ MonoBehaviour:
   targetDetected: 0
   ObjectFiltered: []
   ObjectsCloseAroundCorner: []
-  forceDetectDistance: 20
+  forceDetectDistance: 30
 --- !u!54 &1331126793
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1917,7 +1917,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 32
@@ -1932,7 +1932,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.4
-  m_Speed: 3.5
+  m_Speed: 2
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -2083,7 +2083,7 @@ MonoBehaviour:
   AIHearing: {fileID: 1331126790}
   chaseTarget: 1
   AiVoice: {fileID: 1259971397}
-  patrolRadius: 25
+  patrolRadius: 10
   patrolWaitTime: 1.5
   walkSounds:
   - {fileID: 8300000, guid: 75eeb640b67cb3d40a6a01597961f1cc, type: 3}
@@ -2098,6 +2098,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 7d6ea07185854f745acac3b7e2f57a6a, type: 3}
   - {fileID: 8300000, guid: d3b36c9e61b2840488d0d700b66da837, type: 3}
   movementAudioSource: {fileID: 1856638328}
+  walkSpeed: 2
+  runSpeed: 4
 --- !u!1 &1496068482
 GameObject:
   m_ObjectHideFlags: 0
@@ -2848,7 +2850,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.526
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -2892,7 +2894,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
