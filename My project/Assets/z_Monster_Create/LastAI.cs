@@ -15,7 +15,7 @@ namespace AiSoundDetect.Extra
 
         [SerializeField] private bool chaseTarget = true; // 추격 기능 활성화 여부
 
-        public AudioSource AiVoice; // 추격 시작 시 재생되는 사운드
+        
 
         [Header("AI Patrol Settings")]
         [SerializeField] private float patrolRadius = 10f; // 배회 범위
@@ -27,7 +27,7 @@ namespace AiSoundDetect.Extra
 
         // --------------------[발소리] -----------------
 
-        [Tooltip("zombie foot step")]
+        [Tooltip("Monster foot step")]
         [SerializeField] private AudioClip[] walkSounds; // 걷기 사운드 5개
         [SerializeField] private AudioClip[] runSounds;  // 달리기 사운드 5개
         [SerializeField] private AudioSource movementAudioSource; // 사운드를 재생할 AudioSource
@@ -35,11 +35,21 @@ namespace AiSoundDetect.Extra
         private float footstepDelay = 0.6f;                 // 발소리 간 간격
         private float lastFootstepTime = 0f;
 
+        // --------------------[공격 소리]--------------------
+
+        [Header("Monseter attack sound")]
+        [SerializeField] private AudioClip attackSound;           // 공격 사운드
+        [SerializeField] private AudioSource attackAudioSource;   // 사운드 재생용 오디오 소스
+
+        public AudioSource monseterVoice; // 추격 시작 시 재생되는 사운드
+
         // --------------------[몬스터 속도]------------------
 
         [Header("AI Movement Speeds")]
         [SerializeField] private float walkSpeed = 2f; // 걷는 속도
         [SerializeField] private float runSpeed = 4f;  // 뛰는 속도
+
+        
 
         // --------------------[상태 변수]--------------------
 
@@ -97,7 +107,7 @@ namespace AiSoundDetect.Extra
                 // 쿨타임 내에서 사운드 재생
                 if (Time.time - lastVoiceTime >= voiceCooldown)
                 {
-                    AiVoice.Play();
+                    monseterVoice.Play();
                     lastVoiceTime = Time.time;
                 }
 
@@ -184,6 +194,7 @@ namespace AiSoundDetect.Extra
 
             // 1초 후 배회 루틴 실행
             StartCoroutine(ResumePatrolAfterDelay(1f));
+            navMeshAgent.isStopped = false;
         }
 
 
@@ -288,7 +299,17 @@ namespace AiSoundDetect.Extra
             navMeshAgent.isStopped = true;
 
             animator.ResetTrigger("attack");
-            animator.SetTrigger("attack");
+            animator.SetTrigger("attack"); 
+
+            // 사운드 재생
+            if (attackSound != null && attackAudioSource != null)
+            {
+                attackAudioSource.clip = attackSound;
+                attackAudioSource.Play();
+            }
+
+            // 애니메이션이 실행되면 데미지 처리
+            Invoke("DealDamage", 0.5f); // 0.5초 후 데미지를 주는 함수 호출 (애니메이션의 타이밍에 맞춰서)
 
             StartCoroutine(ResumeAfterAttack());
         }
@@ -386,6 +407,26 @@ namespace AiSoundDetect.Extra
                 PlayRunSound();
 
             lastFootstepTime = Time.time;
+        }
+
+        private void DealDamage()
+        {
+            // 공격이 끝난 시점에 실제 데미지를 주는 코드
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position + transform.forward * 1.5f, 1.5f);
+
+            foreach (var hitCollider in hitColliders)
+            {
+                if (hitCollider.CompareTag("Player"))
+                {   
+                    /* 플레이어 피통
+                    PlayerHealth player = hitCollider.GetComponent<PlayerHealth>();
+                    if (player != null)
+                    {
+                        player.TakeDamage(10); // 예: 플레이어에 데미지를 주는 함수
+                    }
+                    */
+                }
+            }
         }
 
 
